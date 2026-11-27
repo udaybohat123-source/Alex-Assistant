@@ -1,0 +1,2 @@
+-keep class com.alex.assistant.** { *; }
+-dontwarn com.google.firebase.**
