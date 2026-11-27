@@ -24,10 +24,10 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
-      - name: Build Debug APK
+      -- name: Build Debug APK
         run: |
           PROJECT_DIR=$(dirname "$(find . -maxdepth 3 -name 'settings.gradle.kts' | head -n 1)")
-          sed -i 's/firebaseBom = "33.7.0"/firebaseBom = "35.2.0"/' "$PROJECT_DIR/gradle/libs.versions.toml" || true
+          sed -i 's/firebaseBom = "[^"]*"/firebaseBom = "33.16.0"/' "$PROJECT_DIR/gradle/libs.versions.toml" || true
           gradle -p "$PROJECT_DIR" assembleDebug
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
