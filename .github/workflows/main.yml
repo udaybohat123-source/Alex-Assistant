@@ -15,16 +15,22 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Accept Android SDK Licenses
+        run: |
+          SDK_DIR="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER=$(find "$SDK_DIR/cmdline-tools" -name sdkmanager 2>/dev/null | head -n 1)
+          if [ -n "$SDKMANAGER" ]; then yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true; fi
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
       - name: Build Debug APK
-        run: gradle -p ALEX-android-project assembleDebug
+        run: |
+          PROJECT_DIR=$(dirname "$(find . -maxdepth 3 -name 'settings.gradle.kts' | head -n 1)")
+          sed -i 's/firebaseBom = "33.7.0"/firebaseBom = "35.2.0"/' "$PROJECT_DIR/gradle/libs.versions.toml" || true
+          gradle -p "$PROJECT_DIR" assembleDebug
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ALEX-debug-apk
-          path: ALEX-android-project/app/build/outputs/apk/debug/*.apk
+          path: "**/app/build/outputs/apk/debug/*.apk"
